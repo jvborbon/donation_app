@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "82151791391",
+    "project_id": "malasackit-donation-app",
+    "storage_bucket": "malasackit-donation-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82151791391:android:a8c4b3900d5a33932fae2a",
+        "android_client_info": {
+          "package_name": "com.example.donation_app_final"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvzL7eoPZgaonXpzRZKrhtQ2RjyYAtC04"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
