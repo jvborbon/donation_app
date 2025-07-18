@@ -1,7 +1,7 @@
-import 'dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'donation.dart';
 import 'signup.dart';
+import 'admin-panel.dart'; // Import the AdminPanelPage
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -26,15 +26,36 @@ class _LoginPageState extends State<LoginPage> {
 
     _formKey.currentState?.save();
 
-    // Call the login function from the code block
-    bool success = await login(email, password);
-
-    if (success) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => DonationPage(title: 'Home')),
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
-    } else {
-      // Show an error message
+
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('donor_accounts')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        final isAdmin = data['isAdmin'] == true;
+
+        if (isAdmin) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => AdminPanelPage()),
+          );
+        } else {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => DonationPage(title: 'Home')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Account not found.')),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed. Please check your credentials.')),
       );
@@ -43,27 +64,22 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<bool> login(String email, String password) async {
     try {
-      // Authenticate with Firebase Auth
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Optionally, fetch user info from Firestore
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('donor_accounts')
           .doc(userCredential.user!.uid)
           .get();
 
       if (doc.exists) {
-        // User found, proceed to dashboard
         return true;
       } else {
-        // User not found in Firestore
         return false;
       }
     } catch (e) {
-      // Handle error (wrong password, user not found, etc.)
       return false;
     }
   }
@@ -74,7 +90,13 @@ class _LoginPageState extends State<LoginPage> {
         clientId: '82151791391-o40q1luhr0oav1n394612f3m0ro2m0jc.apps.googleusercontent.com',
       );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser == null) return; 
+      if (googleUser == null) {
+        // User cancelled the sign-in
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Google sign-in cancelled.')),
+        );
+        return;
+      }
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
@@ -89,10 +111,17 @@ class _LoginPageState extends State<LoginPage> {
         'Name': userCredential.user!.displayName ?? '',
         'Email': userCredential.user!.email ?? '',
         'Password': '', // Google users don't have a password
-      });
+      }, SetOptions(merge: true));
+
+      // Navigate to DonationPage after successful sign-in
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => DonationPage(title: 'Home')),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google sign-in failed: $e')),
+        SnackBar(content: Text('Google sign-in failed:')),
       );
     }
   }
@@ -111,11 +140,22 @@ class _LoginPageState extends State<LoginPage> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'images/bg.png',
+            'images/collage-lasac-bg.png',
             fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
           ),
           Container(
-            color: Colors.black.withOpacity(0.35),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.fromARGB(180, 209, 14, 14),
+                  Color.fromARGB(180, 209, 14, 14),
+                ],
+              ),
+            ),
           ),
           Center(
             child: SingleChildScrollView(
@@ -195,7 +235,7 @@ class _LoginPageState extends State<LoginPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Don't have an account?"),  
+                            Text("Don't have an account?"),
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pushReplacement(
@@ -209,7 +249,7 @@ class _LoginPageState extends State<LoginPage> {
                           ]
                         ),
                         const SizedBox(height: 16),
-                        Text('----------- OR -----------'), 
+                        Text('----------- OR -----------'),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           icon: Image.asset(
@@ -220,9 +260,7 @@ class _LoginPageState extends State<LoginPage> {
                           label: const Text('Continue with Google'),
                           onPressed: () async {
                             await signInWithGoogle(context);
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(builder: (_) => const DashboardPage()),
-                            );
+                            // Navigation is handled inside signInWithGoogle only on success
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,

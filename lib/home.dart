@@ -17,7 +17,7 @@ class LasacApp extends StatelessWidget {
   const LasacApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {  
     const seed = Color(0xFFCB4232);
 
     return MaterialApp(
@@ -50,7 +50,7 @@ class LandingPage extends StatelessWidget {
     final theme = Theme.of(context);
 
     return FutureBuilder(
-      future: Future.delayed(const Duration(milliseconds: 800)),
+      future: _precacheAllImagesAndDelay(context),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const ThemeLoader();
@@ -58,7 +58,7 @@ class LandingPage extends StatelessWidget {
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: AppBar(
-            title: const SizedBox(), // No logo here, logo is in body
+            title: const SizedBox(),
             backgroundColor: theme.appBarTheme.backgroundColor,
             elevation: 0,
             iconTheme: const IconThemeData(color: Colors.white),
@@ -120,15 +120,14 @@ class LandingPage extends StatelessWidget {
                 width: double.infinity,
                 height: double.infinity,
               ),
-              // Fading red overlay using gradient
               Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Color.fromARGB(180, 209, 14, 14), // Strong red at top
-                      Color.fromARGB(180, 209, 14, 14),  // Faded red at bottom
+                      Color.fromARGB(180, 209, 14, 14),
+                      Color.fromARGB(180, 209, 14, 14),
                     ],
                   ),
                 ),
@@ -137,7 +136,6 @@ class LandingPage extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // App logo with rounded corners
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: Image.asset(
@@ -205,6 +203,12 @@ class LandingPage extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _precacheAllImagesAndDelay(BuildContext context) async {
+    await precacheImage(const AssetImage('images/collage-lasac-bg.png'), context);
+    await precacheImage(const AssetImage('images/lasac.jpeg'), context);
+    await Future.delayed(const Duration(milliseconds: 800));
   }
 }
 

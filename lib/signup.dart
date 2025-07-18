@@ -35,6 +35,7 @@ class _SignupPageState extends State<SignupPage> {
         'Name': _name,
         'Email': _email,
         'Password': _password, // Not recommended to store plain password!
+        'isAdmin': false, // Always set this for new users
       });
 
       // Navigate to LoginPage after successful registration
@@ -62,12 +63,24 @@ class _SignupPageState extends State<SignupPage> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'images/bg.png',
-            fit: BoxFit.cover,
-          ),
-          Container(
-            color: Colors.black.withOpacity(0.35),
-          ),
+                'images/collage-lasac-bg.png',
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+              ),
+              // Fading red overlay using gradient
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color.fromARGB(180, 209, 14, 14), 
+                      Color.fromARGB(180, 209, 14, 14),  
+                    ],
+                  ),
+                ),
+              ),
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
