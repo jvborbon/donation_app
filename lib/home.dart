@@ -26,14 +26,15 @@ class LasacApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 203, 66, 50),
+          seedColor: const Color.fromARGB(255, 209, 14, 14),
           brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: seed, // Set body background to primary color
+        scaffoldBackgroundColor: seed,
         appBarTheme: const AppBarTheme(
           centerTitle: true,
-          backgroundColor: Color.fromARGB(255, 209, 14, 14), // AppBar is now white
+          backgroundColor: Color.fromARGB(255, 209, 14, 14),
           elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white), // Hamburger menu color
         ),
       ),
       home: const LandingPage(),
@@ -49,7 +50,7 @@ class LandingPage extends StatelessWidget {
     final theme = Theme.of(context);
 
     return FutureBuilder(
-      future: Future.delayed(const Duration(milliseconds: 800)), // Simulate loading
+      future: Future.delayed(const Duration(milliseconds: 800)),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const ThemeLoader();
@@ -57,30 +58,101 @@ class LandingPage extends StatelessWidget {
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: AppBar(
-            title: Image.asset('images/lasac.jpeg', height: 40), // Enlarged logo
-            backgroundColor: theme.appBarTheme.backgroundColor, // AppBar is white
+            title: const SizedBox(), // No logo here, logo is in body
+            backgroundColor: theme.appBarTheme.backgroundColor,
             elevation: 0,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
+          drawer: Drawer(
+            backgroundColor: Colors.white,
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                DrawerHeader(
+                  decoration: const BoxDecoration(
+                    color: Color.fromARGB(255, 209, 14, 14),
+                  ),
+                  child: Center(
+                    child: Image.asset(
+                      'images/lasac.jpeg',
+                      height: 64,
+                      width: 64,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.home, color: Color.fromARGB(255, 209, 14, 14)),
+                  title: const Text('Home'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.login, color: Color.fromARGB(255, 209, 14, 14)),
+                  title: const Text('Login'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.volunteer_activism, color: Color.fromARGB(255, 209, 14, 14)),
+                  title: const Text('Donate Now'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
           body: Stack(
             fit: StackFit.expand,
             children: [
               Image.asset(
-                'images/lasac-bg.jpg', // Changed background image
+                'images/collage-lasac-bg.png',
                 fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
               ),
+              // Fading red overlay using gradient
               Container(
-                color: Colors.white.withOpacity(0.65), // White overlay for contrast
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color.fromARGB(180, 209, 14, 14), // Strong red at top
+                      Color.fromARGB(180, 209, 14, 14),  // Faded red at bottom
+                    ],
+                  ),
+                ),
               ),
               Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // App logo with rounded corners
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.asset(
+                        'images/lasac.jpeg',
+                        height: 90,
+                        width: 90,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                     const SizedBox(height: 24),
                     Text(
                       'MaLASACkit App',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        color: theme.colorScheme.primary,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2,
                         fontSize: 32,
@@ -98,59 +170,32 @@ class LandingPage extends StatelessWidget {
                       'Enlarge The Space Of Your Tent.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        color: Colors.black87,
+                        color: Colors.white,
                         fontWeight: FontWeight.w500,
                         fontSize: 18,
                         letterSpacing: 1,
                       ),
                     ),
                     const SizedBox(height: 40),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const LoginPage(),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                            backgroundColor: Colors.white,
-                            foregroundColor: theme.colorScheme.primary,
-                            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 4,
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SignupPage(),
                           ),
-                          child: const Text('Log‑In'),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
+                        backgroundColor: Colors.white,
+                        foregroundColor: theme.colorScheme.primary,
+                        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                        const SizedBox(width: 24),
-                        OutlinedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const SignupPage(),
-                              ),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                            foregroundColor: Colors.white,
-                            backgroundColor: theme.colorScheme.primary,
-                            side: BorderSide(color: theme.colorScheme.primary, width: 2),
-                            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 4,
-                          ),
-                          child: const Text('Sign‑Up'),
-                        ),
-                      ],
+                        elevation: 6,
+                      ),
+                      child: const Text('Join Now!'),
                     ),
                   ],
                 ),

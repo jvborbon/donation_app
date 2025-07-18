@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Image.asset('images/lasac.jpeg', height: 32),
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 209, 14, 14),
         elevation: 0,
       ),
       body: Stack(
