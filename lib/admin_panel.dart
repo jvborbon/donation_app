@@ -42,9 +42,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
 
   final List<Widget> _pages = [
     AdminDashboard(),
-    Center(child: Text('User Accounts', style: TextStyle(fontSize: 22))),
     DonationRequestsPage(),
-    Center(child: Text('Settings', style: TextStyle(fontSize: 22))),
   ];
 
   void _onMenuTap(int index) {
@@ -95,21 +93,10 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
               onTap: () => _onMenuTap(0),
             ),
             ListTile(
-              leading: Icon(Icons.people, color: theme.colorScheme.primary),
-              title: const Text('User Accounts'),
-              onTap: () => _onMenuTap(1),
-            ),
-            ListTile(
               leading: Icon(Icons.assignment, color: theme.colorScheme.primary),
               title: const Text('Donation Requests'),
-              onTap: () => _onMenuTap(2),
+              onTap: () => _onMenuTap(1),
             ),
-            ListTile(
-              leading: Icon(Icons.settings, color: theme.colorScheme.primary),
-              title: const Text('Settings'),
-              onTap: () => _onMenuTap(3),
-            ),
-            const Divider(),
             ListTile(
               leading: Icon(Icons.logout, color: theme.colorScheme.primary),
               title: const Text('Logout', style: TextStyle(color: Colors.black)),

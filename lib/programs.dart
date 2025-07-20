@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'donation_opt.dart';
+import 'in_kind.dart';
 
 class ProgramsPage extends StatelessWidget {
   const ProgramsPage({super.key});
@@ -24,7 +24,7 @@ class ProgramsPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Color.fromARGB(180, 209, 14, 14),
                       ),
                     ),
                   ),
@@ -105,7 +105,7 @@ class DonationProgramCard extends StatelessWidget {
                 showDialog(
                   context: context,
                   barrierDismissible: true, // Allow tap outside to dismiss
-                  builder: (context) => DonationOptionsDialog(programTitle: title),
+                  builder: (context) => InKindDonationPage(programTitle: title),
                 );
               },
             ),

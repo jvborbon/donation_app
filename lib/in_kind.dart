@@ -4,7 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'scheduling.dart';
 
 class InKindDonationPage extends StatefulWidget {
-  const InKindDonationPage({super.key});
+  final String? programTitle;
+  
+  const InKindDonationPage({super.key, this.programTitle});
 
   @override
   State<InKindDonationPage> createState() => _InKindDonationPageState();
@@ -61,6 +63,7 @@ class _InKindDonationPageState extends State<InKindDonationPage> {
         .collection('in_kind_donations')
         .add({
       'userID': user.uid,
+      'programTitle': widget.programTitle, // Add the program title
       'createdAt': FieldValue.serverTimestamp(),
       'dateSchedule': Timestamp.fromDate(_selectedDate!),
       'status': 'pending',
@@ -102,8 +105,14 @@ class _InKindDonationPageState extends State<InKindDonationPage> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
+        title: Text(
+          widget.programTitle != null 
+            ? 'Donate to ${widget.programTitle}' 
+            : 'In-Kind Donation',
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color.fromARGB(255, 209, 14, 14),
-        title: const Text('In-Kind Donation', style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
         color: Colors.white,
@@ -265,7 +274,7 @@ class _InKindDonationPageState extends State<InKindDonationPage> {
                       ElevatedButton(
                         onPressed: () => Navigator.of(context).pop(true),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary,
+                          backgroundColor: const Color.fromARGB(255, 209, 14, 14),
                         ),
                         child: const Text('Confirm'),
                       ),

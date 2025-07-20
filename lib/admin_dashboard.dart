@@ -7,14 +7,11 @@ class AdminDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inKindRef = FirebaseFirestore.instance.collection('in_kind_donations');
-    final cashRef = FirebaseFirestore.instance.collection('cash_donations');
 
     return FutureBuilder(
       future: Future.wait([
         inKindRef.where('status', isEqualTo: 'pending').get(),
         inKindRef.where('status', isEqualTo: 'verified').get(),
-        cashRef.where('status', isEqualTo: 'pending').get(),
-        cashRef.where('status', isEqualTo: 'verified').get(),
       ]),
       builder: (context, AsyncSnapshot<List<QuerySnapshot>> snapshot) {
         if (!snapshot.hasData) {
@@ -22,14 +19,12 @@ class AdminDashboard extends StatelessWidget {
         }
         final pendingInKind = snapshot.data![0].docs.length;
         final deliveredInKind = snapshot.data![1].docs.length;
-        final pendingCash = snapshot.data![2].docs.length;
-        final deliveredCash = snapshot.data![3].docs.length;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _dashboardTile('Total Pending Donations', pendingInKind + pendingCash, Icons.hourglass_empty, Colors.orange),
-            _dashboardTile('Total Successful Donations', deliveredInKind + deliveredCash, Icons.check_circle, Colors.green),
+            _dashboardTile('Total Pending Donations', pendingInKind, Icons.hourglass_empty, Colors.orange),
+            _dashboardTile('Total Successful Donations', deliveredInKind, Icons.check_circle, Colors.green),
             FutureBuilder<int>(
               future: _getTotalInKindQuantityFromInventory(),
               builder: (context, qtySnap) => _dashboardTile(
@@ -40,12 +35,12 @@ class AdminDashboard extends StatelessWidget {
               ),
             ),
             FutureBuilder<double>(
-              future: _getTotalVerifiedCash(),
-              builder: (context, cashSnap) => _dashboardTile(
-                'Total Cash Received',
-                '₱${(cashSnap.data ?? 0).toStringAsFixed(2)}',
-                Icons.attach_money,
-                Colors.red,
+              future: _getTotalInKindValue(),
+              builder: (context, valueSnap) => _dashboardTile(
+                'Total Value of In-Kind Donations',
+                '₱${(valueSnap.data ?? 0).toStringAsFixed(2)}',
+                Icons.monetization_on,
+                Colors.green,
               ),
             ),
           ],
@@ -64,15 +59,28 @@ class AdminDashboard extends StatelessWidget {
     return total;
   }
 
-  Future<double> _getTotalVerifiedCash() async {
+  Future<double> _getTotalInKindValue() async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('cash_donations')
+        .collection('in_kind_donations')
         .where('status', isEqualTo: 'verified')
         .get();
+    
     double total = 0;
+    
     for (var doc in snapshot.docs) {
-      total += (doc['amount'] ?? 0).toDouble();
+      // Get items from the subcollection
+      final itemsSnapshot = await FirebaseFirestore.instance
+          .collection('in_kind_donations')
+          .doc(doc.id)
+          .collection('items')
+          .get();
+      
+      for (var itemDoc in itemsSnapshot.docs) {
+        final value = double.tryParse(itemDoc['value'].toString()) ?? 0;
+        total += value;
+      }
     }
+    
     return total;
   }
 

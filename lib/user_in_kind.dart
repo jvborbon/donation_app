@@ -1,10 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'upload_proof.dart';
-
-
 
 class InKindDonationsTab extends StatelessWidget {
   const InKindDonationsTab({super.key});
@@ -39,118 +36,160 @@ class InKindDonationsTab extends StatelessWidget {
             final status = data['status'] ?? '';
             final dateSchedule = (data['dateSchedule'] as Timestamp?)?.toDate();
             final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text(
-                      status == 'pending'
-                          ? 'Pending In-Kind Donation'
-                          : 'Approved In-Kind Donation',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: status == 'approved'
-                            ? Colors.green
-                            : Colors.orange,
-                      ),
-                    ),
-                    subtitle: Column(
+            
+            return FutureBuilder<QuerySnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('in_kind_donations')
+                  .doc(docId)
+                  .collection('items')
+                  .get(),
+              builder: (context, itemsSnapshot) {
+                List<Map<String, dynamic>> items = [];
+                if (itemsSnapshot.hasData) {
+                  items = itemsSnapshot.data!.docs
+                      .map((doc) => doc.data() as Map<String, dynamic>)
+                      .toList();
+                }
+                
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  color: Colors.grey[50],
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Header with title and status badge
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                status == 'pending'
+                                    ? 'Pending In-Kind Donation'
+                                    : 'Approved In-Kind Donation',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: status == 'approved'
+                                      ? Colors.green
+                                      : Colors.orange,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: status == 'approved' ? Colors.green : Colors.orange,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                status.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 12),
+                        
+                        // Date information
                         if (dateSchedule != null)
                           Text('Scheduled: ${dateSchedule.toLocal().toString().split(' ')[0]}'),
                         if (createdAt != null)
                           Text('Requested: ${createdAt.toLocal().toString().split(' ')[0]}'),
+                        
+                        // Items list
+                        if (items.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Items:',
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 4),
+                          ...items.map((item) => Padding(
+                            padding: const EdgeInsets.only(left: 8, bottom: 2),
+                            child: Text(
+                              '• ${item['donation'] ?? 'Unknown'} - Qty: ${item['quantity'] ?? 'N/A'}, Value: ₱${item['value'] ?? 'N/A'}',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          )),
+                        ],
+                        
+                        // Action buttons based on status
+                        if (status == 'pending') ...[
+                          const SizedBox(height: 16),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              onPressed: () => _cancelDonation(context, docId),
+                              child: const Text('Cancel Request'),
+                            ),
+                          ),
+                        ],
+                        
+                        if (status == 'approved') ...[
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                onPressed: () => _uploadProof(context, docId),
+                                child: const Text('Upload Proof'),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                onPressed: () => _cancelDonation(context, docId),
+                                child: const Text('Cancel'),
+                              ),
+                            ],
+                          ),
+                        ],
+                        
+                        // Status messages
+                        if (status == 'proof_submitted') ...[
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Proof submitted. Waiting for verification.',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ],
+                        
+                        if (status == 'verified') ...[
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Donation verified and completed. Thank you!',
+                            style: TextStyle(color: Colors.green),
+                          ),
+                        ],
                       ],
                     ),
-                    trailing: Chip(
-                      label: Text(
-                        status.toUpperCase(),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      backgroundColor: status == 'approved'
-                          ? Colors.green
-                          : Colors.orange,
-                    ),
                   ),
-                  
-                  // Add action buttons based on status
-                  if (status == 'pending')
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size(120, 40),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                            ),
-                            onPressed: () => _cancelDonation(context, docId),
-                            child: const Text('Cancel Request'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                  if (status == 'approved')
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12.0, bottom: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size(120, 40),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                            ),
-                            onPressed: () => _uploadProof(context, docId),
-                            child: const Text('Upload Proof'),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size(120, 40),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                            ),
-                            onPressed: () => _cancelDonation(context, docId),
-                            child: const Text('Cancel'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                  // Show proof status if submitted
-                  if (status == 'proof_submitted')
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('Proof submitted. Waiting for verification.',
-                        style: TextStyle(fontStyle: FontStyle.italic),
-                      ),
-                    ),
-                    
-                  // Show verified message
-                  if (status == 'verified')
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('Donation verified and completed. Thank you!',
-                        style: TextStyle(color: Colors.green),
-                      ),
-                    ),
-                ],
-              ),
+                );
+              },
             );
           },
         );

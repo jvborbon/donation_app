@@ -18,7 +18,7 @@ class UserDashboard extends StatelessWidget {
         .where('userID', isEqualTo: user.uid);
     final cashRef = FirebaseFirestore.instance
         .collection('cash_donations')
-        .where('userId', isEqualTo: user.uid);
+        .where('userID', isEqualTo: user.uid);
 
     return FutureBuilder(
       future: Future.wait([

@@ -168,22 +168,46 @@ class InKindDonationRequestsTab extends StatelessWidget {
                                       shape: const CircleBorder(),
                                     ),
                                     onPressed: () async {
-                                      await FirebaseFirestore.instance
-                                          .collection('in_kind_donations')
-                                          .doc(docId)
-                                          .update({'status': 'approved'});
-                                      await FirebaseFirestore.instance.collection('notifications').add({
-                                        'userID': userId,
-                                        'donationID': docId,
-                                        'title': 'Donation Approved',
-                                        'message': 'Your donation request has been approved!',
-                                        'notif_timestamp': FieldValue.serverTimestamp(),
-                                        'wasRead': false,
-                                      });
-                                      if (!context.mounted) return;
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Request approved!')),
+                                      // Add confirmation dialog
+                                      final confirm = await showDialog<bool>(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                          title: const Text('Confirm Approval'),
+                                          content: Text('Are you sure you want to approve ${userName}\'s donation request?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.of(ctx).pop(false),
+                                              child: const Text('Cancel'),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () => Navigator.of(ctx).pop(true),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green,
+                                              ),
+                                              child: const Text('Approve', style: TextStyle(color: Colors.white)),
+                                            ),
+                                          ],
+                                        ),
                                       );
+
+                                      if (confirm == true) {
+                                        await FirebaseFirestore.instance
+                                            .collection('in_kind_donations')
+                                            .doc(docId)
+                                            .update({'status': 'approved'});
+                                        await FirebaseFirestore.instance.collection('notifications').add({
+                                          'userID': userId,
+                                          'donationID': docId,
+                                          'title': 'Donation Approved',
+                                          'message': 'Your donation request has been approved!',
+                                          'notif_timestamp': FieldValue.serverTimestamp(),
+                                          'wasRead': false,
+                                        });
+                                        if (!context.mounted) return;
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Request approved!')),
+                                        );
+                                      }
                                     },
                                     child: const Icon(Icons.check, size: 18),
                                   ),
@@ -196,22 +220,46 @@ class InKindDonationRequestsTab extends StatelessWidget {
                                       shape: const CircleBorder(),
                                     ),
                                     onPressed: () async {
-                                      await FirebaseFirestore.instance
-                                          .collection('in_kind_donations')
-                                          .doc(docId)
-                                          .update({'status': 'rejected'});
-                                      await FirebaseFirestore.instance.collection('notifications').add({
-                                        'userID': userId,
-                                        'donationID': docId,
-                                        'title': 'Donation Rejected',
-                                        'message': 'Your donation request has been rejected. Please check the details.',
-                                        'notif_timestamp': FieldValue.serverTimestamp(),
-                                        'wasRead': false,
-                                      });
-                                      if (!context.mounted) return;
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Request rejected!')),
+                                      // Add confirmation dialog for rejection
+                                      final confirm = await showDialog<bool>(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                          title: const Text('Confirm Rejection'),
+                                          content: Text('Are you sure you want to reject ${userName}\'s donation request?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.of(ctx).pop(false),
+                                              child: const Text('Cancel'),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () => Navigator.of(ctx).pop(true),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                              ),
+                                              child: const Text('Reject', style: TextStyle(color: Colors.white)),
+                                            ),
+                                          ],
+                                        ),
                                       );
+
+                                      if (confirm == true) {
+                                        await FirebaseFirestore.instance
+                                            .collection('in_kind_donations')
+                                            .doc(docId)
+                                            .update({'status': 'rejected'});
+                                        await FirebaseFirestore.instance.collection('notifications').add({
+                                          'userID': userId,
+                                          'donationID': docId,
+                                          'title': 'Donation Rejected',
+                                          'message': 'Your donation request has been rejected. Please check the details.',
+                                          'notif_timestamp': FieldValue.serverTimestamp(),
+                                          'wasRead': false,
+                                        });
+                                        if (!context.mounted) return;
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Request rejected!')),
+                                        );
+                                      }
                                     },
                                     child: const Icon(Icons.close, size: 18),
                                   ),
