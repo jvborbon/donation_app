@@ -7,6 +7,7 @@ import 'loader.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -18,8 +19,6 @@ class LasacApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {  
-    const seed = Color(0xFFCB4232);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LASAC App',
@@ -29,12 +28,16 @@ class LasacApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 209, 14, 14),
           brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: seed,
         appBarTheme: const AppBarTheme(
           centerTitle: true,
           backgroundColor: Color.fromARGB(255, 209, 14, 14),
           elevation: 0,
-          iconTheme: IconThemeData(color: Colors.white), // Hamburger menu color
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       home: const LandingPage(),
@@ -47,8 +50,6 @@ class LandingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return FutureBuilder(
       future: _precacheAllImagesAndDelay(context),
       builder: (context, snapshot) {
@@ -56,12 +57,18 @@ class LandingPage extends StatelessWidget {
           return const ThemeLoader();
         }
         return Scaffold(
-          extendBodyBehindAppBar: true,
+          backgroundColor: const Color.fromARGB(255, 209, 14, 14),
           appBar: AppBar(
-            title: const SizedBox(),
-            backgroundColor: theme.appBarTheme.backgroundColor,
+            backgroundColor: const Color.fromARGB(255, 209, 14, 14),
             elevation: 0,
             iconTheme: const IconThemeData(color: Colors.white),
+            leading: Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+                tooltip: 'Open navigation menu',
+              ),
+            ),
           ),
           drawer: Drawer(
             backgroundColor: Colors.white,
@@ -73,11 +80,14 @@ class LandingPage extends StatelessWidget {
                     color: Color.fromARGB(255, 209, 14, 14),
                   ),
                   child: Center(
-                    child: Image.asset(
-                      'images/lasac.jpeg',
-                      height: 64,
-                      width: 64,
-                      fit: BoxFit.cover,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        'images/lasac.jpeg',
+                        height: 64,
+                        width: 64,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
@@ -111,31 +121,30 @@ class LandingPage extends StatelessWidget {
               ],
             ),
           ),
-          body: SafeArea(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    'images/collage-lasac-bg.png',
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color.fromARGB(180, 209, 14, 14),
-                          Color.fromARGB(180, 209, 14, 14),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Center(
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('images/collage-lasac-bg.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromARGB(180, 209, 14, 14),
+                    Color.fromARGB(180, 209, 14, 14),
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(16),
@@ -157,7 +166,7 @@ class LandingPage extends StatelessWidget {
                             fontSize: 32,
                             shadows: [
                               Shadow(
-                                color: Colors.black.withAlpha((0.08 * 255).round()), // was: withOpacity(0.08)
+                                color: Colors.black.withAlpha((0.08 * 255).round()),
                                 offset: const Offset(1, 1),
                                 blurRadius: 2,
                               ),
@@ -176,31 +185,35 @@ class LandingPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 40),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const SignupPage(),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const SignupPage(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
+                              backgroundColor: Colors.white,
+                              foregroundColor: const Color.fromARGB(255, 209, 14, 14),
+                              textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
-                            backgroundColor: Colors.white,
-                            foregroundColor: theme.colorScheme.primary,
-                            textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                              elevation: 6,
                             ),
-                            elevation: 6,
+                            child: const Text('Join Now!'),
                           ),
-                          child: const Text('Join Now!'),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
+            ),
           ),
         );
       },

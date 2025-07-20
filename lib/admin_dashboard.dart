@@ -8,44 +8,61 @@ class AdminDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     final inKindRef = FirebaseFirestore.instance.collection('in_kind_donations');
 
-    return FutureBuilder(
-      future: Future.wait([
-        inKindRef.where('status', isEqualTo: 'pending').get(),
-        inKindRef.where('status', isEqualTo: 'verified').get(),
-      ]),
-      builder: (context, AsyncSnapshot<List<QuerySnapshot>> snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final pendingInKind = snapshot.data![0].docs.length;
-        final deliveredInKind = snapshot.data![1].docs.length;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            'Dashboard Overview',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: const Color.fromARGB(255, 209, 14, 14),
+            ),
+          ),
+        ),
+        Expanded(
+          child: FutureBuilder(
+            future: Future.wait([
+              inKindRef.where('status', isEqualTo: 'pending').get(),
+              inKindRef.where('status', isEqualTo: 'verified').get(),
+            ]),
+            builder: (context, AsyncSnapshot<List<QuerySnapshot>> snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final pendingInKind = snapshot.data![0].docs.length;
+              final deliveredInKind = snapshot.data![1].docs.length;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _dashboardTile('Total Pending Donations', pendingInKind, Icons.hourglass_empty, Colors.orange),
-            _dashboardTile('Total Successful Donations', deliveredInKind, Icons.check_circle, Colors.green),
-            FutureBuilder<int>(
-              future: _getTotalInKindQuantityFromInventory(),
-              builder: (context, qtySnap) => _dashboardTile(
-                'Total In-Kind Received',
-                qtySnap.data ?? 0,
-                Icons.card_giftcard,
-                Colors.blue,
-              ),
-            ),
-            FutureBuilder<double>(
-              future: _getTotalInKindValue(),
-              builder: (context, valueSnap) => _dashboardTile(
-                'Total Value of In-Kind Donations',
-                '₱${(valueSnap.data ?? 0).toStringAsFixed(2)}',
-                Icons.monetization_on,
-                Colors.green,
-              ),
-            ),
-          ],
-        );
-      },
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _dashboardTile('Total Pending Donations', pendingInKind, Icons.hourglass_empty, Colors.orange),
+                  _dashboardTile('Total Successful Donations', deliveredInKind, Icons.check_circle, Colors.green),
+                  FutureBuilder<int>(
+                    future: _getTotalInKindQuantityFromInventory(),
+                    builder: (context, qtySnap) => _dashboardTile(
+                      'Total In-Kind Received',
+                      qtySnap.data ?? 0,
+                      Icons.card_giftcard,
+                      Colors.blue,
+                    ),
+                  ),
+                  FutureBuilder<double>(
+                    future: _getTotalInKindValue(),
+                    builder: (context, valueSnap) => _dashboardTile(
+                      'Total Value of In-Kind Donations',
+                      '₱${(valueSnap.data ?? 0).toStringAsFixed(2)}',
+                      Icons.monetization_on,
+                      Colors.green,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
