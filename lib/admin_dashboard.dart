@@ -34,36 +34,79 @@ class AdminDashboard extends StatelessWidget {
               final pendingInKind = snapshot.data![0].docs.length;
               final deliveredInKind = snapshot.data![1].docs.length;
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _dashboardTile('Total Pending Donations', pendingInKind, Icons.hourglass_empty, Colors.orange),
-                  _dashboardTile('Total Successful Donations', deliveredInKind, Icons.check_circle, Colors.green),
-                  FutureBuilder<int>(
-                    future: _getTotalInKindQuantityFromInventory(),
-                    builder: (context, qtySnap) => _dashboardTile(
-                      'Total In-Kind Received',
-                      qtySnap.data ?? 0,
-                      Icons.card_giftcard,
-                      Colors.blue,
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    // First Row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _dashboardCard(
+                            'Pending\nDonations', 
+                            pendingInKind.toString(), 
+                            Icons.hourglass_empty, 
+                            Colors.orange
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _dashboardCard(
+                            'Successful\nDonations', 
+                            deliveredInKind.toString(), 
+                            Icons.check_circle, 
+                            Colors.green
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  FutureBuilder<double>(
-                    future: _getTotalInKindValue(),
-                    builder: (context, valueSnap) => _dashboardTile(
-                      'Total Value of In-Kind Donations',
-                      '₱${(valueSnap.data ?? 0).toStringAsFixed(2)}',
-                      Icons.monetization_on,
-                      Colors.green,
+                    const SizedBox(height: 16),
+                    // Second Row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FutureBuilder<int>(
+                            future: _getTotalInKindQuantityFromInventory(),
+                            builder: (context, qtySnap) => _dashboardCard(
+                              'Items\nReceived',
+                              (qtySnap.data ?? 0).toString(),
+                              Icons.inventory,
+                              Colors.blue,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: FutureBuilder<double>(
+                            future: _getTotalInKindValue(),
+                            builder: (context, valueSnap) => _dashboardCard(
+                              'Total\nValue',
+                              '₱${_formatNumber(valueSnap.data ?? 0)}',
+                              Icons.monetization_on,
+                              Colors.purple,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               );
             },
           ),
         ),
       ],
     );
+  }
+
+  String _formatNumber(double number) {
+    if (number >= 1000000) {
+      return '${(number / 1000000).toStringAsFixed(1)}M';
+    } else if (number >= 1000) {
+      return '${(number / 1000).toStringAsFixed(1)}K';
+    } else {
+      return number.toStringAsFixed(0);
+    }
   }
 
   Future<int> _getTotalInKindQuantityFromInventory() async {
@@ -85,7 +128,6 @@ class AdminDashboard extends StatelessWidget {
     double total = 0;
     
     for (var doc in snapshot.docs) {
-      // Get items from the subcollection
       final itemsSnapshot = await FirebaseFirestore.instance
           .collection('in_kind_donations')
           .doc(doc.id)
@@ -101,15 +143,81 @@ class AdminDashboard extends StatelessWidget {
     return total;
   }
 
-  Widget _dashboardTile(String label, dynamic value, IconData icon, Color color) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: ListTile(
-        leading: Icon(icon, color: color, size: 32),
-        title: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        trailing: Text(
-          '$value',
-          style: TextStyle(fontSize: 20, color: color, fontWeight: FontWeight.bold),
+  Widget _dashboardCard(String label, String value, IconData icon, Color color) {
+    return Container(
+      height: 140,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top row with icon and live indicator
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: color,
+                    size: 20,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'LIVE',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            // Value
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 4),
+            // Label
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+                height: 1.2,
+              ),
+            ),
+          ],
         ),
       ),
     );
