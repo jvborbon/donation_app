@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'donation.dart';
 import 'signup.dart';
-import 'admin-panel.dart'; // Import the AdminPanelPage
+import 'admin_panel.dart'; // Import the AdminPanelPage
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -37,6 +37,8 @@ class _LoginPageState extends State<LoginPage> {
           .doc(userCredential.user!.uid)
           .get();
 
+      if (!mounted) return; // <-- Add this check before using context
+
       if (doc.exists) {
         final data = doc.data() as Map<String, dynamic>;
         final isAdmin = data['isAdmin'] == true;
@@ -56,8 +58,9 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
+      if (!mounted) return; // <-- Add this check before using context
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed. Please check your credentials.')),
+        SnackBar(content: Text('Invalid email or password. Please check your credentials.')),
       );
     }
   }
@@ -92,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         // User cancelled the sign-in
+        if (!context.mounted) return; // <-- Use context.mounted for local context
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Google sign-in cancelled.')),
         );
@@ -113,13 +117,12 @@ class _LoginPageState extends State<LoginPage> {
         'Password': '', // Google users don't have a password
       }, SetOptions(merge: true));
 
-      // Navigate to DonationPage after successful sign-in
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => DonationPage(title: 'Home')),
-        );
-      }
+      if (!context.mounted) return; // <-- Use context.mounted for local context
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => DonationPage(title: 'Home')),
+      );
     } catch (e) {
+      if (!context.mounted) return; // <-- Use context.mounted for local context
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Google sign-in failed:')),
       );
@@ -161,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Card(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withAlpha((0.9 * 255).round()), // was: withOpacity(0.9)
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),

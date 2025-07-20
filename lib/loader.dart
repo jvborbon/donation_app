@@ -9,7 +9,7 @@ class ThemeLoader extends StatelessWidget {
     return Center(
       child: CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-        backgroundColor: theme.colorScheme.surface.withOpacity(0.2),
+        backgroundColor: theme.colorScheme.surface.withAlpha((0.2 * 255).round()), // was: withOpacity(0.2)
         strokeWidth: 4,
       ),
     );

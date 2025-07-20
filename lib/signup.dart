@@ -38,11 +38,14 @@ class _SignupPageState extends State<SignupPage> {
         'isAdmin': false, // Always set this for new users
       });
 
+      // Check mounted before using context after async gaps
+      if (!mounted) return;
       // Navigate to LoginPage after successful registration
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const LoginPage()),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Signup failed: $e')),
       );
@@ -85,7 +88,7 @@ class _SignupPageState extends State<SignupPage> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Card(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withAlpha((0.9 * 255).round()), // was: withOpacity(0.9)
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),

@@ -161,86 +161,121 @@ class _InKindDonationPageState extends State<InKindDonationPage> {
                         onChanged: (val) => donation['value'] = val,
                         initialValue: donation['value'],
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: idx == 0
-                            ? const SizedBox.shrink()
-                            : IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  setState(() {
-                                    _donations.removeAt(idx);
-                                  });
-                                },
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (idx == 0)
+                            const SizedBox(width: 40)
+                          else
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                setState(() {
+                                  _donations.removeAt(idx);
+                                });
+                              },
+                            ),
+                          SizedBox(
+                            width: 100,
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.add, size: 16, color: Colors.white),
+                              label: const Text(
+                                'Add',
+                                style: TextStyle(fontSize: 14, color: Colors.white),
                               ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255, 209, 14, 14),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              onPressed: _addDonationForm,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 130,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255, 209, 14, 14),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              onPressed: () async {
+                                final scheduledDate = await showDialog<DateTime>(
+                                  context: context,
+                                  builder: (_) => SchedulingDialog(initialDate: _selectedDate),
+                                );
+                                if (scheduledDate != null) {
+                                  setState(() {
+                                    _selectedDate = scheduledDate;
+                                  });
+                                }
+                              },
+                              child: const Text(
+                                'Schedule',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
               );
             }),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 100,
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.add, size: 16, color: Colors.white),
-                    label: const Text(
-                      'Add',
-                      style: TextStyle(fontSize: 14, color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 209, 14, 14),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: _addDonationForm,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                SizedBox(
-                  width: 130,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 209, 14, 14),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: () async {
-                      final scheduledDate = await showDialog<DateTime>(
-                        context: context,
-                        builder: (_) => SchedulingDialog(initialDate: _selectedDate),
-                      );
-                      if (scheduledDate != null) {
-                        setState(() {
-                          _selectedDate = scheduledDate;
-                        });
-                      }
-                    },
-                    child: const Text(
-                      'Schedule',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
               ),
-              onPressed: _submitDonations,
+              onPressed: () async {
+                if (_selectedDate == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please select a schedule date.')),
+                  );
+                  return;
+                }
+                if (_donations.isEmpty || _donations.any((d) => d['donation'].isEmpty || d['quantity'].isEmpty || d['value'].isEmpty)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please fill out all donation fields.')),
+                  );
+                  return;
+                }
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Confirm In-Kind Donation'),
+                    content: Text(
+                      'Are you sure you want to submit your in-kind donation request scheduled for ${_selectedDate!.toLocal().toString().split(' ')[0]}?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                        ),
+                        child: const Text('Confirm'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirm == true) {
+                  await _submitDonations();
+                }
+              },
               child: const Text('Submit', style: TextStyle(color: Colors.white)),
             ),
           ],

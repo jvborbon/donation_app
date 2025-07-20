@@ -111,94 +111,96 @@ class LandingPage extends StatelessWidget {
               ],
             ),
           ),
-          body: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.asset(
-                'images/collage-lasac-bg.png',
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
-              ),
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color.fromARGB(180, 209, 14, 14),
-                      Color.fromARGB(180, 209, 14, 14),
-                    ],
+          body: SafeArea(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    'images/collage-lasac-bg.png',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
-                ),
-              ),
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.asset(
-                        'images/lasac.jpeg',
-                        height: 90,
-                        width: 90,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'MaLASACkit App',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                        fontSize: 32,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withOpacity(0.08),
-                            offset: const Offset(1, 1),
-                            blurRadius: 2,
-                          ),
+                  Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color.fromARGB(180, 209, 14, 14),
+                          Color.fromARGB(180, 209, 14, 14),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Enlarge The Space Of Your Tent.',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 18,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const SignupPage(),
+                  ),
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.asset(
+                            'images/lasac.jpeg',
+                            height: 90,
+                            width: 90,
+                            fit: BoxFit.cover,
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
-                        backgroundColor: Colors.white,
-                        foregroundColor: theme.colorScheme.primary,
-                        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
                         ),
-                        elevation: 6,
-                      ),
-                      child: const Text('Join Now!'),
+                        const SizedBox(height: 24),
+                        Text(
+                          'MaLASACkit App',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                            fontSize: 32,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withAlpha((0.08 * 255).round()), // was: withOpacity(0.08)
+                                offset: const Offset(1, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Enlarge The Space Of Your Tent.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const SignupPage(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
+                            backgroundColor: Colors.white,
+                            foregroundColor: theme.colorScheme.primary,
+                            textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 6,
+                          ),
+                          child: const Text('Join Now!'),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
           ),
         );
       },

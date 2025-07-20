@@ -1,8 +1,9 @@
+import 'package:donation_app_final/admin_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
-import 'admin-donationreq.dart';
+import 'admin_donationreq.dart';
 
 class AdminPanelPage extends StatefulWidget {
   const AdminPanelPage({super.key});
@@ -40,7 +41,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
   }
 
   final List<Widget> _pages = [
-    Center(child: Text('Dashboard', style: TextStyle(fontSize: 22))),
+    AdminDashboard(),
     Center(child: Text('User Accounts', style: TextStyle(fontSize: 22))),
     DonationRequestsPage(),
     Center(child: Text('Settings', style: TextStyle(fontSize: 22))),

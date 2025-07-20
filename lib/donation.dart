@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'donation_opt.dart';
+import 'programs.dart';
 import 'login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'notifications.dart';
+import 'donationhistory.dart';
 
 class DonationPage extends StatefulWidget {
   const DonationPage({super.key, required this.title});
@@ -16,6 +18,9 @@ class DonationPage extends StatefulWidget {
 class _DonationPageState extends State<DonationPage> {
   String accountName = '';
   String accountEmail = '';
+  int _selectedIndex = 0;
+
+  final GlobalKey _profileIconKey = GlobalKey();
 
   @override
   void initState() {
@@ -26,6 +31,7 @@ class _DonationPageState extends State<DonationPage> {
   Future<void> _loadUserInfo() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
+      if (!mounted) return;
       setState(() {
         accountEmail = user.email ?? '';
       });
@@ -34,162 +40,187 @@ class _DonationPageState extends State<DonationPage> {
           .collection('donor_accounts')
           .doc(user.uid)
           .get();
+      if (!mounted) return;
       setState(() {
         accountName = doc.data()?['Name'] ?? '';
       });
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 209, 14, 14),
-        title: const Text('MaLASACkit App', style: TextStyle(color: Colors.white)),
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Future<void> _showProfileBanner(BuildContext context) async {
+    final RenderBox button = _profileIconKey.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final Offset position = button.localToGlobal(Offset.zero, ancestor: overlay);
+
+    await showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy + button.size.height,
+        position.dx + button.size.width,
+        0,
       ),
-      drawer: Drawer(
-        child: Container(
-          color: Colors.white,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              // Drawer Header with correct background color
-              UserAccountsDrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 209, 14, 14), // Fixed: header color
+      items: [
+        PopupMenuItem(
+          enabled: false,
+          padding: EdgeInsets.zero,
+          child: Container(
+            width: 260,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 ),
-                accountName: Text(accountName, style: const TextStyle(color: Colors.white)),
-                accountEmail: Text(accountEmail, style: const TextStyle(color: Colors.white)),
-                currentAccountPicture: const CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.person, size: 40, color: Color.fromARGB(255, 23, 23, 23)),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircleAvatar(
+                  radius: 36,
+                  backgroundColor: Color.fromARGB(255, 209, 14, 14),
+                  child: Icon(Icons.person, size: 40, color: Colors.white),
                 ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.home, color: Color.fromARGB(255, 209, 14, 14)),
-                title: const Text('Home', style: TextStyle(color: Colors.black)),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.favorite, color: Color.fromARGB(255, 209, 14, 14)),
-                title: const Text('My Donations', style: TextStyle(color: Colors.black)),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.notifications, color: Color.fromARGB(255, 209, 14, 14)),
-                title: const Text('Notifications', style: TextStyle(color: Colors.black)),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings, color: Color.fromARGB(255, 209, 14, 14)),
-                title: const Text('Settings', style: TextStyle(color: Colors.black)),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout, color: Color.fromARGB(255, 209, 14, 14)),
-                title: const Text('Logout', style: TextStyle(color: Colors.black)),
-                onTap: () async {
-                  final shouldLogout = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Confirm Logout'),
-                      content: const Text('Are you sure you want to log out?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(false),
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(true),
-                          child: const Text('Logout'),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (shouldLogout == true) {
-                    await FirebaseAuth.instance.signOut();
-                    if (mounted) {
+                const SizedBox(height: 16),
+                Text(
+                  accountName,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  accountEmail,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.logout),
+                  label: const Text('Logout'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(120, 40),
+                  ),
+                  onPressed: () async {
+                    Navigator.of(context).pop(); // Close the menu
+                    final shouldLogout = await showDialog<bool>(
+                      context: context,
+                      builder: (logoutDialogContext) => AlertDialog(
+                        title: const Text('Confirm Logout'),
+                        content: const Text('Are you sure you want to log out?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(logoutDialogContext).pop(false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(logoutDialogContext).pop(true),
+                            child: const Text('Logout'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (shouldLogout == true) {
+                      await FirebaseAuth.instance.signOut();
+                      if (!mounted) return;
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (_) => const LoginPage()),
                       );
                     }
-                  }
-                },
-              ),
-            ],
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      body: Container(
-        color: Colors.white, // Light background for better contrast
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            DonationProgramCard(
-              title: 'Defeat Poverty',
-              description: 'Help provide daily needs to people in need.',
-            ),
-            DonationProgramCard(
-              title: 'Clean Water Initiative',
-              description: 'Support clean water projects in rural areas.',
-            ),
-            DonationProgramCard(
-              title: 'Education for All',
-              description: 'Donate to support education for underprivileged kids.',
-            ),
-            DonationProgramCard(
-              title: 'Education for All',
-              description: 'Donate to support education for underprivileged kids.',
-            ),
-          ],
-        ),
-      ),
+      ],
+      elevation: 8,
+      color: Colors.transparent, // Use transparent to keep custom card color
     );
   }
-}
-
-class DonationProgramCard extends StatelessWidget {
-  final String title;
-  final String description;
-
-  const DonationProgramCard({
-    super.key,
-    required this.title,
-    required this.description,
-  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      color: Colors.grey[50], // Subtle card color for contrast
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: Icon(Icons.volunteer_activism, color: theme.colorScheme.primary),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(description),
-        trailing: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: Colors.white,
-          ),
-          child: const Text('Donate'),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => DonationOptionsDialog(programTitle: title),
-            );
-          },
+    final List<Widget> pages = [
+      ProgramsPage(),
+      DonationHistoryPage(),
+      NotificationsPage(),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: const Color.fromARGB(255, 209, 14, 14),
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10), // Adjust the radius as you like
+              child: Image.asset(
+                'images/lasac.jpeg',
+                height: 36,
+                width: 36,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'MaLASACkit App',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              key: _profileIconKey,
+              icon: const Icon(Icons.person, color: Colors.white),
+              onPressed: () => _showProfileBanner(context),
+              tooltip: 'Profile',
+            ),
+          ),
+        ],
+      ),
+      body: Container(
+        color: Colors.white,
+        child: pages[_selectedIndex],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: const Color.fromARGB(255, 209, 14, 14),
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'My Donations',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: 'Notifications',
+          ),
+        ],
       ),
     );
   }
 }
+
+
+
+
+
