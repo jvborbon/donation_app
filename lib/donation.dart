@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'notifications.dart';
 import 'donationhistory.dart';
+import 'user_dashboard.dart';
 
 class DonationPage extends StatefulWidget {
   const DonationPage({super.key, required this.title});
@@ -155,6 +156,7 @@ class _DonationPageState extends State<DonationPage> {
       ProgramsPage(),
       DonationHistoryPage(),
       NotificationsPage(),
+      UserDashboard(),
     ];
 
     return Scaffold(
@@ -208,11 +210,15 @@ class _DonationPageState extends State<DonationPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
-            label: 'My Donations',
+            label: 'Donations',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
             label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
           ),
         ],
       ),

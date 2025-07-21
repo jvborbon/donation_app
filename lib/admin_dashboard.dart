@@ -43,7 +43,7 @@ class AdminDashboard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: _dashboardCard(
-                            'Pending\nDonations', 
+                            'Pending', 
                             pendingInKind.toString(), 
                             Icons.hourglass_empty, 
                             Colors.orange
@@ -52,7 +52,7 @@ class AdminDashboard extends StatelessWidget {
                         const SizedBox(width: 16),
                         Expanded(
                           child: _dashboardCard(
-                            'Successful\nDonations', 
+                            'Successful', 
                             deliveredInKind.toString(), 
                             Icons.check_circle, 
                             Colors.green
@@ -68,7 +68,7 @@ class AdminDashboard extends StatelessWidget {
                           child: FutureBuilder<int>(
                             future: _getTotalInKindQuantityFromInventory(),
                             builder: (context, qtySnap) => _dashboardCard(
-                              'Items\nReceived',
+                              'Items',
                               (qtySnap.data ?? 0).toString(),
                               Icons.inventory,
                               Colors.blue,
@@ -80,7 +80,7 @@ class AdminDashboard extends StatelessWidget {
                           child: FutureBuilder<double>(
                             future: _getTotalInKindValue(),
                             builder: (context, valueSnap) => _dashboardCard(
-                              'Total\nValue',
+                              'Total Value',
                               '₱${_formatNumber(valueSnap.data ?? 0)}',
                               Icons.monetization_on,
                               Colors.purple,
@@ -145,76 +145,89 @@ class AdminDashboard extends StatelessWidget {
 
   Widget _dashboardCard(String label, String value, IconData icon, Color color) {
     return Container(
-      height: 140,
+      height: 120, 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: 1,
-            blurRadius: 8,
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16), 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Top row with icon and live indicator
+           
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(
                     icon,
                     color: color,
-                    size: 20,
+                    size: 18, // Smaller icon
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text(
                     'LIVE',
                     style: TextStyle(
                       color: Colors.green,
-                      fontSize: 10,
+                      fontSize: 8, // Smaller font
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ],
             ),
-            const Spacer(),
-            // Value
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: 4),
-            // Label
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-                height: 1.2,
+           
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  // Value
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 24, // Smaller font
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  // Label
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12, 
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
           ],

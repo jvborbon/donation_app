@@ -173,7 +173,7 @@ class InKindDonationRequestsTab extends StatelessWidget {
                                         context: context,
                                         builder: (ctx) => AlertDialog(
                                           title: const Text('Confirm Approval'),
-                                          content: Text('Are you sure you want to approve ${userName}\'s donation request?'),
+                                          content: Text('Are you sure you want to approve $userName\'s donation request?'),
                                           actions: [
                                             TextButton(
                                               onPressed: () => Navigator.of(ctx).pop(false),
@@ -225,7 +225,7 @@ class InKindDonationRequestsTab extends StatelessWidget {
                                         context: context,
                                         builder: (ctx) => AlertDialog(
                                           title: const Text('Confirm Rejection'),
-                                          content: Text('Are you sure you want to reject ${userName}\'s donation request?'),
+                                          content: Text('Are you sure you want to reject $userName\'s donation request?'),
                                           actions: [
                                             TextButton(
                                               onPressed: () => Navigator.of(ctx).pop(false),

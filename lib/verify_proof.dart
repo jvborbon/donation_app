@@ -1,4 +1,4 @@
-// New file: c:\Users\ASUS\Desktop\Donation_App\donation_app_final\lib\verify_proof.dart
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
@@ -70,7 +70,7 @@ class VerifyProofPage extends StatelessWidget {
                 ),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.check_circle),
-                  label: const Text('Verify & Add to Inventory'),
+                  label: const Text('Verify '),
                   onPressed: () => _verifyAndAddToInventory(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,

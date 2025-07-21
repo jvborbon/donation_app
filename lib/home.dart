@@ -1,15 +1,10 @@
-import 'package:donation_app_final/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'login.dart';
 import 'signup.dart';
 import 'loader.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void main() async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+void main() {
   runApp(const LasacApp());
 }
 
