@@ -63,7 +63,7 @@ class _InKindDonationPageState extends State<InKindDonationPage> {
         .collection('in_kind_donations')
         .add({
       'userID': user.uid,
-      'programTitle': widget.programTitle, // Add the program title
+      'programTitle': widget.programTitle, 
       'createdAt': FieldValue.serverTimestamp(),
       'dateSchedule': Timestamp.fromDate(_selectedDate!),
       'status': 'pending',

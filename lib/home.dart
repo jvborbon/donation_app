@@ -4,9 +4,6 @@ import 'signup.dart';
 import 'loader.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void main() {
-  runApp(const LasacApp());
-}
 
 class LasacApp extends StatelessWidget {
   const LasacApp({super.key});
