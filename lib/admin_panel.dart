@@ -69,15 +69,15 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
           children: [
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: Color.fromARGB(255, 209, 14, 14),
               ),
               accountName: Text(
                 accountName,
-                style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
               accountEmail: Text(
                 accountEmail,
-                style: const TextStyle(color: Colors.black54),
+                style: const TextStyle(color: Colors.white),
               ),
               currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.white,

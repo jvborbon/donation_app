@@ -190,7 +190,7 @@ class AdminDashboard extends StatelessWidget {
                     'LIVE',
                     style: TextStyle(
                       color: Colors.green,
-                      fontSize: 8, // Smaller font
+                      fontSize: 8, 
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -209,7 +209,7 @@ class AdminDashboard extends StatelessWidget {
                     child: Text(
                       value,
                       style: TextStyle(
-                        fontSize: 24, // Smaller font
+                        fontSize: 24, 
                         fontWeight: FontWeight.bold,
                         color: color,
                       ),
