@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
@@ -175,6 +174,11 @@ class VerifyProofPage extends StatelessWidget {
     });
 
     if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Donation verified and added to inventory')),
+    );
+
     Navigator.of(context).pop(true);
   }
 }

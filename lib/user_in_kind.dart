@@ -59,7 +59,6 @@ class InKindDonationsTab extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Header with title and status badge
                         Row(
                           children: [
                             Expanded(

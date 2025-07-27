@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
-import 'signup.dart';
+import 'about.dart';
 import 'loader.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -92,11 +92,11 @@ class LandingPage extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Icon(Icons.volunteer_activism, color: Color.fromARGB(255, 209, 14, 14)),
-                  title: const Text('Donate Now'),
+                  title: const Text('About Us'),
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                      MaterialPageRoute(builder: (_) => const AboutPage()),
                     );
                   },
                 ),
@@ -172,7 +172,7 @@ class LandingPage extends StatelessWidget {
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (_) => const SignupPage(),
+                                builder: (_) => const LoginPage(),
                               ),
                             );
                           },
@@ -207,3 +207,4 @@ class LandingPage extends StatelessWidget {
 }
 
 
+ 

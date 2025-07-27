@@ -94,7 +94,7 @@ class _UploadProofPageState extends State<UploadProofPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Upload Proof of Delivery'),
+        title: const Text('Upload Proof of Delivery', style: TextStyle(color: Colors.white),),
         backgroundColor: Color.fromARGB(255, 209, 14, 14),
       ),
       body: _isUploading

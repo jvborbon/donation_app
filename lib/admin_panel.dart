@@ -67,24 +67,21 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            Container(
-              color: const Color.fromARGB(255, 209, 14, 14),
-              child: UserAccountsDrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                ),
-                accountName: Text(
-                  accountName,
-                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                ),
-                accountEmail: Text(
-                  accountEmail,
-                  style: const TextStyle(color: Colors.black54),
-                ),
-                currentAccountPicture: const CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.admin_panel_settings, size: 40, color: Color.fromARGB(255, 23, 23, 23)),
-                ),
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              accountName: Text(
+                accountName,
+                style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              ),
+              accountEmail: Text(
+                accountEmail,
+                style: const TextStyle(color: Colors.black54),
+              ),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.admin_panel_settings, size: 40, color: Color.fromARGB(255, 23, 23, 23)),
               ),
             ),
             ListTile(
